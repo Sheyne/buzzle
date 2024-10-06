@@ -1,6 +1,7 @@
-function choose<T>(xs: T[]): [T, number] {
+function choose<T>(xs: T[]): [T, number] | undefined {
+    if (xs.length === 0) { return undefined; }
     const index = Math.floor(Math.random() * xs.length);
-    return [xs[index], index]
+    return [xs[index]!, index]
 }
 
 function ordered(players: [string, string]) {
@@ -9,22 +10,37 @@ function ordered(players: [string, string]) {
     return sorted;
 }
 
+export class GameIsOver extends Error {};
+
 export class Game {
     constructor(
         public players: Set<string> = new Set(),
-        public buzzles: [string, string][] = []
+        public buzzles: [string, string][] = [],
+        private upcomingPairs: [string, string][] = [],
     ) {}
 
-    public copy(): Game {
-        return new Game(new Set(this.players), [...this.buzzles]);
+    public static fromJSON(state: {players: string[], buzzles: [string, string][], upcoming: [string, string][]}) {
+        return new Game(new Set(state.players), state.buzzles, state.upcoming);
+    }
+
+    public toJSON() {
+        return {players: [...this.players], buzzles: this.buzzles, upcoming: this.upcomingPairs};
     }
 
     public addPlayer(player: string) {
         this.players.add(player);
     }
 
-    public addRound(players: [string, string]) {
-        this.buzzles.push(ordered(players));
+    public addRound(players?: [string, string]) {
+        if (players != null) {
+            this.buzzles.push(ordered(players));
+        } else {
+            const next = this.upcoming.shift();
+            if (next == null) {
+                throw new GameIsOver();
+            }
+            this.addRound(next);
+        }
     }
 
     private buzzleCounts(): [string, number][] {
@@ -40,58 +56,73 @@ export class Game {
     }
 
     private isTooRecent(player: string) {
-        const mostRecentPair = this.buzzles[this.buzzles.length - 1];
-        return mostRecentPair.includes(player);
+        return this.upcomingPairs.flat().includes(player);
     }
 
-    private untilValid(getPlayers: () => [string, string]): [string, string] {
-        let choice: [string, string];
-        do {
-            choice = getPlayers();
-        } while (this.buzzles.find(([a, b]) => a === choice[0] && b === choice[1]));
-        return choice;
+    private untilValid(getPlayers: () => [string, string] | undefined): [string, string] | undefined {
+        for (let x = 0; x < 500 ; x += 1) {
+            const choice = getPlayers();
+            if (choice != null && !this.buzzles.find(([a, b]) => a === choice[0] && b === choice[1])) {
+                return choice;
+            }
+        };
+        return undefined;
     }
 
-    public findNextPairing() {
+    private findNextPairingInternal({diameter}: {diameter: number}) {
         const counts = this.buzzleCounts().filter(([player]) => !this.isTooRecent(player));
-        const secondPlayerCount = counts[1][1];
-        if (secondPlayerCount == null) {
-            // todo: no valid options
+        const secondPlayerCount = counts[1]?.[1];
+        const [firstPlayer, ...otherPlayers] = counts;
+        if (firstPlayer == null || secondPlayerCount == null) {
+            return undefined;
         }
-        const playersMatchingSecond = counts
-            .filter(([_, count]) => count === secondPlayerCount)
+
+        const playersMatchingSecond = otherPlayers
+            .filter(([_, count]) => count - diameter <= secondPlayerCount)
             .map(([player]) => player);
         
-        if (counts[0][1] === secondPlayerCount) {
+        if (firstPlayer[1] === secondPlayerCount) {
             // player 1 is the same as all the players matching second
             return this.untilValid(() => {
-                // todo: if we run out, look into more played players
-                const candidates = [...playersMatchingSecond];
-                const [player1, index] = choose(candidates);
+                const candidates = [firstPlayer[0], ...playersMatchingSecond];
+                const choice = choose(candidates);
+                if (!choice) return undefined;
+                const [player1, index] = choice;
                 candidates.splice(index, 1);
-                const [player2] = choose(candidates);
+                const choice2 = choose(candidates);
+                if (!choice2) return undefined;
+                const [player2] = choice2;
                 return ordered([player1, player2]);
             });
         } else {
             // player 1 is priority
             return this.untilValid(() => {
-                if (playersMatchingSecond.length === 0) {
-                    // todo: fetch more people
-                }
-                const [player, index] = choose(playersMatchingSecond);
+                const choice = choose(playersMatchingSecond);
+                if (!choice) return undefined;
+                const [player, index] = choice;
                 playersMatchingSecond.splice(index, 1);
-                return ordered([counts[0][0], player]);
+                return ordered([firstPlayer[0], player]);
             });
         }
     }
 
-    public upcoming(): [string, string][] {
-        const first = this.findNextPairing();
-        const next = this.copy();
-        next.addRound(first);
-        const second = next.findNextPairing();
-        const after = next.copy();
-        after.addRound(second);
-        return [first, second, after.findNextPairing()];
+    private findNextPairing() {
+        for (let diameter = 0; diameter < 3; diameter += 1) {
+            const attempt = this.findNextPairingInternal({diameter});
+            if (attempt) return attempt;
+        }
+    }
+
+    private calculateUpcoming() {
+        while (this.upcomingPairs.length < 3) {
+            const pair = this.findNextPairing();
+            if (!pair) { return; }
+            this.upcomingPairs.push(pair);
+        }
+    }
+
+    public get upcoming(): [string, string][] {
+        this.calculateUpcoming();
+        return this.upcomingPairs;
     }
 }
