@@ -31,6 +31,10 @@ export class Game {
         this.players.add(player);
     }
 
+    public resetUpcoming() {
+        this.upcomingPairs = [];
+    }
+
     public addRound(players?: [string, string]) {
         if (players != null) {
             this.buzzles.push(ordered(players));

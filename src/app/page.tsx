@@ -2,16 +2,17 @@
 
 import styles from "./page.module.css";
 import {Game} from "./game";
-import { useState } from "react";
+import useLocalStorageState from "use-local-storage-state";
 
 export default function Home() {
-  const [hasBegun, setHasBegun] = useState(false);
-  const [state, setState] = useState(() => new Game().toJSON());
+  const [hasBegun, setHasBegun] = useLocalStorageState("hasBegun", {defaultValue: false});
+  const [state, setState] = useLocalStorageState("gameState", {defaultValue: () => new Game().toJSON()});
   const game = Game.fromJSON(state);
 
   function existingParings() {
   if (hasBegun) {
     const [active, onDeck, inTheHole] = game.upcoming;
+    setState(game.toJSON());
     return (
       <div>
       <h2>Who's next?</h2>
@@ -63,10 +64,17 @@ export default function Home() {
       </form>
 
       {hasBegun ? (
+        <div>
       <input type="button" value="Apply round" onClick={(e) => {
         game.addRound();
         setState(game.toJSON());
-      }}/>) : (
+      }}/>
+      <input type="button" value="Reset up next" onClick={(e) => {
+        game.resetUpcoming();
+        setState(game.toJSON());
+      }} />
+      </div>
+      ) : (
         <input type="button" value="Start game" onClick={(e) => {
           setHasBegun(true);
         }}/>
