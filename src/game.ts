@@ -10,21 +10,21 @@ function ordered(players: [string, string]) {
     return sorted;
 }
 
-export class GameIsOver extends Error {};
+type StateJson = {players: string[], buzzles: [string, string, number][], upcoming: [string, string][]};
 
 export class Game {
     constructor(
         public players: Set<string> = new Set(),
-        public buzzles: [string, string][] = [],
+        public buzzles: Map<[string, string], number> = new Map(),
         private upcomingPairs: [string, string][] = [],
     ) {}
 
-    public static fromJSON(state: {players: string[], buzzles: [string, string][], upcoming: [string, string][]}) {
-        return new Game(new Set(state.players), state.buzzles, state.upcoming);
+    public static fromJSON(state: StateJson) {
+        return new Game(new Set(state.players), new Map(state.buzzles.map(([p1, p2, time]) => [[p1, p2], time])), state.upcoming);
     }
 
-    public toJSON() {
-        return {players: [...this.players], buzzles: this.buzzles, upcoming: this.upcomingPairs};
+    public toJSON(): StateJson {
+        return {players: [...this.players], buzzles: [...this.buzzles.entries()].map<[string, string, number]>(([[p1, p2], time]) => [p1, p2, time]), upcoming: this.upcomingPairs};
     }
 
     public addPlayer(player: string) {
@@ -35,21 +35,18 @@ export class Game {
         this.upcomingPairs = [];
     }
 
-    public addRound(players?: [string, string]) {
-        if (players != null) {
-            this.buzzles.push(ordered(players));
-        } else {
-            const next = this.upcoming.shift();
-            if (next == null) {
-                throw new GameIsOver();
-            }
-            this.addRound(next);
+    public addRound(players: [string, string], time: number) {
+        const orderedPlayers = ordered(players);
+        this.buzzles.set(orderedPlayers, time);
+        const nextPlayers = this.upcoming[0];
+        if (nextPlayers && nextPlayers[0] === players[0] && nextPlayers[1] === players[1]) {
+            this.upcoming.shift();
         }
     }
 
-    private buzzleCounts(): [string, number][] {
+    public buzzleCounts(): [string, number][] {
         const result = new Map<string, number>([...this.players].map(p => [p, 0]));
-        for (const players of this.buzzles) {
+        for (const players of this.buzzles.keys()) {
             for (const player of players) {
                 result.set(player, (result.get(player) ?? 0) + 1);
             }
@@ -66,7 +63,7 @@ export class Game {
     private untilValid(getPlayers: () => [string, string] | undefined): [string, string] | undefined {
         for (let x = 0; x < 500 ; x += 1) {
             const choice = getPlayers();
-            if (choice != null && !this.buzzles.find(([a, b]) => a === choice[0] && b === choice[1])) {
+            if (choice != null && ![...this.buzzles.keys()].find(([a, b]) => a === choice[0] && b === choice[1])) {
                 return choice;
             }
         };
