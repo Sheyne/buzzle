@@ -127,7 +127,15 @@ export class Game {
         return this.upcomingPairs;
     }
 
-    public leaderboard(): [string, string, number][] {
-        return [...this.buzzles.entries()].map(([[p1, p2], t]) => [p1, p2, t])
+    public leaderboard(limit?: number): [string, string, number][] {
+        const times = [...this.buzzles.entries()].map<[string, string, number]>(([[p1, p2], t]) => [p1, p2, t]);
+
+        times.sort(([_1, _2, time1], [_3, _4, time2]) => time1 - time2);
+
+        if (limit != null) {
+            times.splice(limit);
+        }
+
+        return times;
     }
 }

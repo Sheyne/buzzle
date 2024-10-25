@@ -1,10 +1,11 @@
 import { Game } from "./game";
 import useLocalStorageState from "use-local-storage-state";
 import { minutesAndSeconds, fromMinutesAndSeconds } from "./minutesAndSeconds";
+import "./App.css";
 
 function Leaderboard({ times }: { times: [string, string, number][] }) {
   return (
-    <>
+    <div className="leaderboard">
       <h2>Leaderboard</h2>
       <ol>
         {times.map(([p1, p2, time]) => (
@@ -13,7 +14,22 @@ function Leaderboard({ times }: { times: [string, string, number][] }) {
           </li>
         ))}
       </ol>
-    </>
+    </div>
+  );
+}
+
+function Pairing({
+  title,
+  players: [player1, player2],
+}: {
+  title: string;
+  players: [string, string];
+}) {
+  return (
+    <div className="pairing">
+      <div className="title">{title}</div>
+      {player1} & {player2}
+    </div>
   );
 }
 
@@ -23,30 +39,17 @@ function Upnext({
   upcoming: [string, string][];
 }) {
   return (
-    <>
-      <h2>Who's next?</h2>
-      {active != null ? (
-        <div>
-          Active: {active[0]} & {active[1]}
-        </div>
-      ) : (
-        ""
-      )}
-      {onDeck != null ? (
-        <div>
-          On deck: {onDeck[0]} & {onDeck[1]}
-        </div>
-      ) : (
-        ""
-      )}
-      {inTheHole != null ? (
-        <div>
-          In the hole: {inTheHole[0]} & {inTheHole[1]}
-        </div>
-      ) : (
-        ""
-      )}
-    </>
+    <div className="upnext">
+      {active != null ? <Pairing title="Up next" players={active} /> : <></>}
+      <div className="secondaries">
+        {onDeck != null ? <Pairing title="On deck" players={onDeck} /> : <></>}
+        {inTheHole != null ? (
+          <Pairing title="In the hole" players={inTheHole} />
+        ) : (
+          <></>
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -137,10 +140,11 @@ function GameActive({
 }) {
   return (
     <>
-      <Leaderboard times={leaderboard} />
-      <Players buzzleCounts={buzzleCounts} hasBegun={true} />
+      <div className="main">
+        <Leaderboard times={leaderboard} />
+        <Upnext upcoming={upcoming} />
+      </div>
       {showAddPlayers ? <AddPlayers addPlayer={addPlayer} /> : <></>}
-      <Upnext upcoming={upcoming} />
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -212,7 +216,7 @@ export default function App() {
       <GameActive
         showAddPlayers={true}
         buzzleCounts={game.buzzleCounts()}
-        leaderboard={game.leaderboard()}
+        leaderboard={game.leaderboard(10)}
         addPlayer={addPlayer}
         upcoming={game.upcoming}
         playRound={(player1, player2, time) => {

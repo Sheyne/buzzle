@@ -1,0 +1,40 @@
+.main {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+}
+
+.leaderboard {
+    width: 100%;
+}
+
+.upnext {
+    padding: 1em;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1em;
+    background-color: #ffcccc;
+    font-size: 200%;
+}
+
+.upnext .secondaries {
+    display: flex;
+    flex-direction: row;
+    gap: 1em;
+}
+
+.upnext .secondaries div {
+    width: 100%;
+}
+
+.upnext .pairing {
+    background-color: #ffaaaa;
+    padding: 1em;
+    font-weight: bold;
+    text-align: center;
+}
+
+.upnext .pairing .title {
+    font-weight: normal;
+}
