@@ -193,21 +193,30 @@ export default function App() {
   const [state, setState] = useLocalStorageState("gameState", {
     defaultValue: () => new Game().toJSON(),
   });
-  const game = Game.fromJSON(state);
-  const addPlayer = (player: string) => {
-    game.addPlayer(player);
+
+  const setGameState = () => {
+    game.upcoming;
     setState(game.toJSON());
   };
+
+  const withGame = (f: (game: Game) => void) => {
+    f(game);
+    setGameState();
+  };
+
+  const game = Game.fromJSON(state);
+  const addPlayer = (player: string) =>
+    withGame((game) => game.addPlayer(player));
 
   if (!hasBegun) {
     return (
       <GameSetup
         buzzleCounts={game.buzzleCounts()}
-        startGame={() => {
-          game.upcoming;
-          setState(game.toJSON());
-          setHasBegun(true);
-        }}
+        startGame={() =>
+          withGame(() => {
+            setHasBegun(true);
+          })
+        }
         addPlayer={addPlayer}
       />
     );
@@ -219,15 +228,10 @@ export default function App() {
         leaderboard={game.leaderboard(10)}
         addPlayer={addPlayer}
         upcoming={game.upcoming}
-        playRound={(player1, player2, time) => {
-          game.addRound([player1, player2], time);
-          setState(game.toJSON());
-        }}
-        resetUpcoming={() => {
-          game.resetUpcoming();
-          game.upcoming;
-          setState(game.toJSON());
-        }}
+        playRound={(player1, player2, time) =>
+          withGame((game) => game.addRound([player1, player2], time))
+        }
+        resetUpcoming={() => withGame((game) => game.resetUpcoming())}
       />
     );
   }
