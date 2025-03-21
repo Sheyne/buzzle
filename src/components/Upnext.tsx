@@ -7,11 +7,11 @@ export function Upnext({
 }) {
   return (
     <div className="upnext">
-      {active != null ? <Pairing title="Up next" players={active} /> : <></>}
+      {active != null ? <Pairing title="UP NEXT" players={active} /> : <></>}
       <div className="secondaries">
-        {onDeck != null ? <Pairing title="On deck" players={onDeck} /> : <></>}
+        {onDeck != null ? <Pairing title="ON DECK" players={onDeck} /> : <></>}
         {inTheHole != null ? (
-          <Pairing title="In the hole" players={inTheHole} />
+          <Pairing title="IN THE HOLE" players={inTheHole} />
         ) : (
           <></>
         )}
