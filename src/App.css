@@ -1,11 +1,77 @@
+html, body {
+    padding: 0;
+    margin: 0;
+    height: 100%;
+    background-color: #dfa;
+}
+
+#root {
+    height: 100%;
+}
+
 .main {
     display: flex;
     flex-direction: row;
     align-items: flex-start;
+    height: 100%;
 }
 
 .leaderboard {
     width: 100%;
+    background-color: #f4cda0;
+    height: 100%;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.leaderboard .card-container {
+    padding: 0.5em;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.leaderboard .card {
+    padding: 0.5em;
+    margin: 0.5em;
+    display: flex;
+    width: min-content;
+    flex-direction: row;
+    font-family: "Gloria Hallelujah", cursive;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.leaderboard .card-1 {
+    font-size: 150%;
+}
+.leaderboard .card-2, .leaderboard .card-3 {
+    font-size: 120%;
+}
+.leaderboard .card .time {
+    font-size: 200%;
+    padding: 0.2em;
+    align-self: center;
+}
+.leaderboard .card .rank {
+    padding: 0.2em;
+    font-size: 200%;
+    align-self: center;
+}
+.leaderboard .card .rank:before {
+    content: "#";
+    font-size: 70%;
+    color: #555;
+}
+.leaderboard .card .times {
+    text-align: center;
+    padding: 0.2em;
+    align-self: center;
+}
+.leaderboard .card .times :nth-child(even) {
+    color: #555;
+    font-size: 70%;
 }
 
 .upnext {
@@ -14,7 +80,7 @@
     flex-direction: column;
     align-items: stretch;
     gap: 1em;
-    background-color: #ffcccc;
+    background-color: #fe8d8d;
     font-size: 200%;
 }
 
@@ -37,4 +103,17 @@
 
 .upnext .pairing .title {
     font-weight: normal;
+}
+
+.controls {
+    padding: 1em;
+    background-color: rgb(136, 249, 255);
+}
+
+.controls * {
+    margin: 0.1em;
+}
+
+.controls hr {
+    margin-top: 4em;
 }
