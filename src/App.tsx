@@ -231,7 +231,7 @@ function GameActive({
                 <input
                   name="player1"
                   type="text"
-                  defaultValue={upcoming[0][0]}
+                  defaultValue={upcoming[0]?.[0]}
                 />
               </label>
               <label>
@@ -239,7 +239,7 @@ function GameActive({
                 <input
                   name="player2"
                   type="text"
-                  defaultValue={upcoming[0][1]}
+                  defaultValue={upcoming[0]?.[1]}
                 />
               </label>
               <label>
