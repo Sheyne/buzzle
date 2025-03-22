@@ -30,6 +30,7 @@ export function GameActive({
     <>
       <div className="main">
         <div className="left">
+          <div className="buzzle-party">¡Buzzle Party!</div>
           <Upnext upcoming={upcoming} />
           <div className="controls">
             <form

@@ -74,7 +74,23 @@ html, body {
     font-size: 70%;
 }
 
-.upnext {
+.buzzle-party {
+    font-size: 300%;
+    text-align: center;
+    padding: 0.5em 0;
+    text-shadow: 
+    -0.05em 0.05em #ef355040,
+    -0.10em 0.10em #f48fb130,
+    -0.15em 0.15em #7e57c220,
+    -0.20em 0.20em #2196f320,
+    -0.25em 0.25em #26c6da20,
+    -0.30em 0.30em #43a04720,
+    -0.35em 0.35em #eeff4120,
+    -0.40em 0.40em #f9a82520,
+    -0.45em 0.45em #ff572220;
+}
+
+.upnext .stack {
     padding: 1em;
     display: flex;
     flex-direction: column;
@@ -84,29 +100,54 @@ html, body {
     font-size: 200%;
 }
 
-.upnext .secondaries {
+.upnext .puzzle-part {
+    display: block;
+    width: 6em;
+    height: 6em;
+    padding: 0;
+    background-color: #fe8d8d;
+    position: relative;
+    border-radius: 3em;
+}
+
+.upnext .puzzle-part:first-child {
+    top: 9em;
+    left: -1em;
+    float: right;
+    margin: 0 -6em 0 0;
+}
+
+.upnext .puzzle-part:last-child {
+    background-color: rgb(136, 249, 255);
+    left: calc(50% - 3em);
+    top: 1em;
+    margin: -6em 0 0 0;
+}
+
+.upnext .stack .secondaries {
     display: flex;
     flex-direction: row;
     gap: 1em;
 }
 
-.upnext .secondaries div {
+.upnext .stack .secondaries div {
     width: 100%;
 }
 
-.upnext .pairing {
+.upnext .stack .pairing {
     background-color: #ffaaaa;
     padding: 1em;
     font-weight: bold;
     text-align: center;
 }
 
-.upnext .pairing .title {
+.upnext .stack .pairing .title {
     font-weight: normal;
     font-size: 60%;
 }
 
 .controls {
+    z-index: 1;
     padding: 1em;
     background-color: rgb(136, 249, 255);
 }

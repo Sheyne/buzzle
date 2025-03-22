@@ -20,7 +20,8 @@ export function cleanupString(x: string): string {
   return x;
 }
 export function colorOf(player1: string, player2: string) {
-  return `hsl(${(hash(JSON.stringify([player1, player2])) / 12345) * 69}deg 70% 70%)`;
+  const hashed = hash(JSON.stringify([player1, player2]));
+  return `hsl(${hashed}deg 77% 73%)`;
 }
 export function rotation(nonce: string) {
   return `${Math.sin(hash(nonce) * 1.69) * 3.14}deg`;
