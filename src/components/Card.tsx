@@ -5,7 +5,8 @@ export function Card(args: {
   playersAndTime: [string, string, number];
   rank: number;
 }) {
-  const [p1, p2, time] = args.playersAndTime;
+  if (!args || !args.playersAndTime) return <></>;
+  const [p1, p2, time] = args?.playersAndTime;
   return (
     <div
       className={`card card-${args.rank}`}
